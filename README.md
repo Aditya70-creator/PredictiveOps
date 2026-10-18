@@ -1,162 +1,194 @@
-# 🧠 CampusMind — Multimodal OCR & Hybrid RAG Document Intelligence
+# ⚙️ PredictiveOps — Time-Series Anomaly Detection & Predictive Maintenance MLOps
 
 ![Status](https://img.shields.io/badge/Status-Active_Development-10B981?style=for-the-badge)
-![Domain](https://img.shields.io/badge/Domain-NLP_%7C_Hybrid_RAG_%7C_Document_AI-8B5CF6?style=for-the-badge)
-![Stack](https://img.shields.io/badge/Stack-PyTorch_%7C_HuggingFace_%7C_Qdrant_%7C_FastAPI-00E7FF?style=for-the-badge)
+![Domain](https://img.shields.io/badge/Domain-Time--Series_%26_IoT_MLOps-00E7FF?style=for-the-badge)
+![Stack](https://img.shields.io/badge/Stack-PyTorch_%7C_Feature_Engineering_%7C_Prometheus_%7C_Docker-3B82F6?style=for-the-badge)
 
-> **CampusMind** is a Document AI and Hybrid Retrieval-Augmented Generation (RAG) system designed to process academic and enterprise PDFs, scanned notices, and structured documents. It combines OCR, document classification, sparse and dense retrieval, reranking, and citation-backed question answering.
+> **PredictiveOps** is an industrial time-series Machine Learning and MLOps platform designed to detect sensor anomalies and estimate equipment degradation before failure. It combines causal rolling-window features, point-in-time-correct data processing, walk-forward temporal validation, and monitored model serving.
 
 ---
 
 ## 🏗️ System Architecture
 
-```mermaid
+```mermaid id="p9s3lx"
 flowchart LR
-    Doc["Scanned PDFs<br/>& Documents"] --> OCR["OCR & Layout-Aware<br/>Chunking Pipeline"]
-    OCR --> Clf["Custom Document<br/>Classifier & Metadata Extraction"]
+    Sensor["Multi-Sensor IoT<br/>Telemetry Stream"] --> Win["Rolling Time-Window<br/>Feature Engineering"]
+    Win --> FS[("Point-in-Time<br/>Feature Store")]
+    FS --> Split["Walk-Forward<br/>Temporal Validation"]
+    Split --> Model["Anomaly Detection<br/>& RUL Prediction"]
+    Model --> Serve["Inference Service<br/>Health & Metrics"]
+    Serve --> Alert["Early-Warning Alerts<br/>& Prometheus Monitoring"]
 
-    Clf --> Sparse["BM25 Lexical Index"]
-    Clf --> Dense[("Qdrant Vector DB<br/>Dense Embeddings")]
-
-    Sparse --> Rerank["Reciprocal Rank Fusion<br/>& Cross-Encoder Reranking"]
-    Dense --> Rerank
-
-    Rerank --> QA["Grounded Question Answering<br/>with Source Citations"]
-
-    style Doc fill:#070b14,stroke:#00E7FF,stroke-width:2px,color:#ffffff
-    style OCR fill:#0f172a,stroke:#3B82F6,stroke-width:2px,color:#ffffff
-    style Clf fill:#0f172a,stroke:#8B5CF6,stroke-width:2px,color:#ffffff
-    style Sparse fill:#0f172a,stroke:#f59e0b,stroke-width:2px,color:#ffffff
-    style Dense fill:#0f172a,stroke:#00E7FF,stroke-width:2px,color:#ffffff
-    style Rerank fill:#0f172a,stroke:#10B981,stroke-width:2px,color:#ffffff
-    style QA fill:#070b14,stroke:#c084fc,stroke-width:2px,color:#ffffff
+    style Sensor fill:#070b14,stroke:#00E7FF,stroke-width:2px,color:#ffffff
+    style Win fill:#0f172a,stroke:#3B82F6,stroke-width:2px,color:#ffffff
+    style FS fill:#0f172a,stroke:#8B5CF6,stroke-width:2px,color:#ffffff
+    style Split fill:#0f172a,stroke:#f59e0b,stroke-width:2px,color:#ffffff
+    style Model fill:#0f172a,stroke:#00E7FF,stroke-width:2px,color:#ffffff
+    style Serve fill:#0f172a,stroke:#10B981,stroke-width:2px,color:#ffffff
+    style Alert fill:#070b14,stroke:#10B981,stroke-width:2px,color:#ffffff
 ```
 
 ## 🎯 Project Objectives
 
-- Extract usable text and layout information from digital and scanned documents.
-- Classify documents and extract useful metadata before indexing.
-- Compare lexical search against dense semantic retrieval.
-- Improve search relevance using Reciprocal Rank Fusion (RRF) and cross-encoder reranking.
-- Generate answers grounded in retrieved document passages with traceable source citations.
-- Evaluate retrieval quality and answer faithfulness using reproducible benchmarks.
+- Detect abnormal equipment behavior from multivariate sensor telemetry.
+- Engineer causal time-series features across multiple historical windows.
+- Estimate Remaining Useful Life (RUL) when suitable failure and lifecycle labels are available.
+- Evaluate models using chronological validation rather than random splitting.
+- Serve predictions through a monitored inference service.
+- Track service health, prediction latency, and operational metrics with Prometheus.
 
-## 🔧 Core ML & NLP Engineering Focus
+## 🔧 Core ML & MLOps Engineering Focus
 
-### 1. Custom Document Classification
+### 1. Rolling-Window Feature Engineering
 
-Trains and evaluates a document taxonomy classifier to categorize circulars, syllabi, timetables, research papers, and technical documents before indexing. Metadata extraction can identify useful fields such as document type, title, date, and section.
+Extracts historical sensor patterns using configurable time windows, such as `1h`, `6h`, and `24h`, depending on the sampling frequency and prediction horizon.
 
-### 2. Hybrid Retrieval Benchmarking
+Feature examples include:
 
-Combines **BM25 lexical retrieval** with **dense semantic embeddings** to retrieve documents using both exact keyword matches and semantic similarity.
+- Lag features from previous observations.
+- Rolling means and standard deviations.
+- Exponential moving averages (EMA).
+- Sensor rate-of-change and first differences.
+- Window-based minimums, maximums, and quantiles.
 
-The retrieval pipeline compares:
+Every feature must use only observations available at its prediction timestamp. Window boundaries and missing-data handling should be documented explicitly.
 
-- BM25 lexical retrieval
-- Dense vector retrieval using Qdrant
-- Hybrid retrieval using Reciprocal Rank Fusion (RRF)
-- Hybrid retrieval with cross-encoder reranking
+### 2. Leak-Free Walk-Forward Validation
 
-### 3. Layout-Aware OCR & Chunking
+Uses expanding-window or rolling-window temporal validation instead of random `train_test_split` for time-dependent prediction tasks.
 
-Processes scanned and digital PDFs while preserving section headings, page references, and table boundaries where possible. Structure-aware chunking helps reduce context fragmentation and improves retrieval relevance.
+- Train on historical observations.
+- Validate on a later time interval.
+- Advance the cutoff and repeat.
+- Fit preprocessing and model parameters using training data only.
+- Apply an appropriate gap or embargo when overlapping windows or delayed labels could cause leakage.
 
-### 4. Citation-Backed Question Answering
+This design helps prevent lookahead bias and produces a more realistic estimate of future performance.
 
-Uses retrieved document chunks as evidence for generated answers. Responses include source references such as document names, page numbers, and relevant passages when available. The system should distinguish unsupported questions from those adequately answered by the retrieved evidence.
+### 3. Anomaly Detection & Remaining Useful Life Modeling
 
-### 5. Quantitative Retrieval Evaluation
+Supports two related but distinct tasks:
 
-Evaluates retrieval quality using:
+**Anomaly Detection**
+- Establish statistical or reconstruction-based baselines.
+- Evaluate Isolation Forest, reconstruction-error models, or other suitable methods.
+- Measure detection quality using metrics such as precision, recall, false alarm rate, and detection delay when ground truth is available.
 
-- **Recall@K:** Whether relevant documents appear among the top K results.
-- **Mean Reciprocal Rank (MRR):** How highly the first relevant result is ranked.
-- **Normalized Discounted Cumulative Gain (NDCG):** How effectively the ranking places relevant results near the top.
+**Remaining Useful Life (RUL) Prediction**
+- Train supervised regression or temporal models when lifecycle and failure labels are available.
+- Compare against simple baselines.
+- Evaluate with MAE or RMSE and analyze prediction errors across equipment and operating conditions.
 
-Compare these metrics across retrieval strategies using the same evaluation queries and relevance labels.
+Anomaly scores alone do not provide reliable RUL estimates; RUL modeling requires an appropriate target and evaluation protocol.
+
+### 4. Point-in-Time-Correct Feature Store
+
+Maintains consistent feature definitions for training and inference.
+
+- Prevents future observations from entering historical training features.
+- Applies the same transformations in offline and online pipelines.
+- Tracks feature timestamps, entity identifiers, and data availability.
+- Reduces training-serving skew through shared feature logic and validation tests.
+
+A dedicated feature-store product is optional for the initial implementation; a versioned feature pipeline can establish the same core principles.
+
+### 5. Monitored Inference & Early-Warning Alerts
+
+Exposes model predictions through an inference service and exports operational metrics for Prometheus.
+
+Monitoring can include:
+
+- Request counts and prediction latency.
+- Service availability and error rates.
+- Sensor input quality and missing-value rates.
+- Anomaly score distributions and alert volumes.
+- Model-quality metrics when delayed ground truth becomes available.
+
+Alert thresholds should be configurable and evaluated against historical data to control excessive false alarms.
 
 ## 🧰 Technology Stack
 
 - **Language:** Python
-- **Deep Learning:** PyTorch
-- **NLP Models:** Hugging Face Transformers
-- **Document Processing:** PDF parsing and OCR tools
-- **Sparse Retrieval:** BM25
-- **Vector Database:** Qdrant
-- **Retrieval Fusion:** Reciprocal Rank Fusion
-- **Reranking:** Cross-encoder models
-- **API Serving:** FastAPI
-- **Evaluation:** Recall@K, MRR, NDCG
+- **Data Processing:** Pandas, NumPy
+- **Machine Learning:** Scikit-learn, PyTorch
+- **Time-Series Features:** Lag features, rolling statistics, EMA
+- **Model Evaluation:** Walk-forward temporal validation
+- **Monitoring:** Prometheus
+- **Deployment:** Docker, Docker Compose
+- **Serving:** A Python inference API, such as FastAPI
 
-*Choose the OCR library, embedding model, and reranker based on document quality, language requirements, latency, and available compute.*
+*The specific models, serving framework, and monitoring integrations should reflect the actual implementation.*
 
 ## 📂 Repository Structure
 
-```text
-CampusMind/
+```text id="q4wn2z"
+PredictiveOps/
 ├── src/
-│   ├── ocr_ingest/
-│   │   └── pipeline.py           # PDF parsing, OCR and chunking
-│   ├── classifier/
-│   │   └── train_classifier.py   # Document classification
-│   ├── retrieval/
-│   │   ├── bm25_search.py        # Sparse lexical retrieval
-│   │   ├── dense_search.py       # Qdrant vector retrieval
-│   │   └── fusion.py             # Hybrid ranking and RRF
-│   └── evaluation/
-│       └── benchmark.py          # Recall@K, MRR and NDCG
-├── api/
-│   └── main.py                   # FastAPI endpoints
+│   ├── ingestion/
+│   │   └── telemetry.py          # Sensor data ingestion and validation
+│   ├── windowing/
+│   │   └── features.py            # Causal lags and rolling statistics
+│   ├── validation/
+│   │   └── walk_forward.py       # Temporal cross-validation
+│   ├── models/
+│   │   ├── anomaly.py             # Anomaly detection models
+│   │   └── rul.py                 # Remaining Useful Life estimators
+│   └── serving/
+│       ├── api.py                 # Model inference endpoints
+│       └── metrics.py             # Prometheus metrics
 ├── tests/
+├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt
 └── README.md
 ```
 
-*This is a suggested repository layout. Adjust filenames and modules to match the actual implementation.*
+*This is a suggested repository layout. Adjust filenames and modules to match the actual codebase.*
+
+## 📊 Evaluation Metrics
+
+| Metric | Purpose |
+|---|---|
+| Precision | Fraction of predicted anomalies that are genuine |
+| Recall | Fraction of known anomalies detected |
+| False Alarm Rate | Frequency of false anomaly alerts |
+| Detection Delay | Time between an anomaly beginning and its detection |
+| MAE | Average absolute error for RUL estimates |
+| RMSE | Penalizes larger RUL prediction errors |
+| Inference Latency | Time taken to generate a prediction |
+
+Choose metrics according to the task. For unlabeled anomaly data, document the limitations of evaluating against proxy labels or manually reviewed events.
 
 ## 🗺️ Engineering Roadmap
 
-- [x] Hybrid RAG architecture and retrieval evaluation harness design
-- [x] OCR ingestion and layout-aware document chunking pipeline
-- [ ] Custom document classifier fine-tuning and metadata tagger
-- [ ] BM25 versus dense retrieval benchmark
-- [ ] Reciprocal Rank Fusion integration and evaluation
-- [ ] Cross-encoder reranking benchmark
-- [ ] Citation-backed question-answering endpoint
-- [ ] FastAPI document ingestion and query service
-- [ ] Automated evaluation tests and reproducible benchmarks
+- [x] Multi-sensor temporal pipeline and causal-window specification
+- [x] Walk-forward validation harness and future-leakage checks
+- [ ] Unsupervised anomaly detection baselines
+- [ ] Supervised RUL benchmark using suitable lifecycle labels
+- [ ] Containerized inference endpoint
+- [ ] Prometheus service-health and latency metrics
+- [ ] Configurable early-warning rules and alert evaluation
+- [ ] Automated tests for temporal feature correctness
+- [ ] Reproducible experiments and model-performance reports
 
-*Mark a milestone as completed only when its implementation and evaluation are available in the repository.*
+*Keep completed milestones aligned with implemented and tested functionality.*
 
-## 🔬 Evaluation Strategy
+## 🔬 Data & Reproducibility
 
-### Retrieval Evaluation
+For reproducible experiments:
 
-Evaluate all retrieval approaches on the same held-out query set, with relevance labels prepared independently of model predictions.
-
-| Metric | What it measures |
-|---|---|
-| Recall@K | Coverage of relevant documents in the top K results |
-| MRR | Ranking position of the first relevant result |
-| NDCG@K | Ranking quality with graded relevance |
-| Retrieval Latency | Time required to retrieve and rank results |
-
-### Answer Quality
-
-Assess generated answers separately from retrieval quality:
-
-- **Groundedness:** Are the claims supported by retrieved evidence?
-- **Citation Accuracy:** Do cited sources support the associated claims?
-- **Answer Relevance:** Does the response address the user's question?
-- **Abstention:** Does the system acknowledge insufficient evidence?
+1. Document the dataset source, sensor units, sampling frequency, and equipment identifiers.
+2. Define prediction timestamps, forecast horizons, and label-generation rules.
+3. Use chronological train, validation, and test partitions.
+4. Fit transformations using training data only.
+5. Test rolling features against hand-calculated examples to verify timestamp correctness.
+6. Report results across multiple temporal splits where feasible.
+7. Record model parameters, evaluation results, and dataset versions.
 
 ## ⚠️ Project Status
 
-CampusMind is under active development. Planned components should not be presented as completed integrations until they have been implemented and tested.
-
-For reproducibility, document the dataset sources, OCR configuration, embedding model, chunking strategy, retrieval parameters, and evaluation query set. Avoid committing confidential documents, private academic records, or other sensitive data.
+PredictiveOps is under active development. Anomaly detection, RUL estimation, feature storage, and monitoring are separate capabilities that should be validated independently before being integrated into a production workflow.
 
 ---
 
-*CampusMind — Turning complex documents into searchable, explainable knowledge.*
+*PredictiveOps — Turning industrial telemetry into actionable maintenance intelligence.*
