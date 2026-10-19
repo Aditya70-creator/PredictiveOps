@@ -1,0 +1,65 @@
+{
+  "winning_model": "LogisticRegression_Baseline",
+  "optimal_threshold": 0.9984,
+  "features": [
+    "sensor_temperature_c",
+    "vibration_mm_s",
+    "pressure_bar",
+    "rotational_speed_rpm",
+    "operating_hours",
+    "torque_nm"
+  ],
+  "leaderboard": {
+    "LogisticRegression_Baseline": {
+      "pr_auc": 1.0,
+      "f1_score": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "optimal_threshold": 0.9984,
+      "confusion_matrix": [
+        [
+          1372,
+          0
+        ],
+        [
+          0,
+          28
+        ]
+      ]
+    },
+    "RandomForest": {
+      "pr_auc": 1.0,
+      "f1_score": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "optimal_threshold": 0.7867,
+      "confusion_matrix": [
+        [
+          1372,
+          0
+        ],
+        [
+          0,
+          28
+        ]
+      ]
+    },
+    "XGBoost": {
+      "pr_auc": 1.0,
+      "f1_score": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "optimal_threshold": 0.9991,
+      "confusion_matrix": [
+        [
+          1372,
+          0
+        ],
+        [
+          0,
+          28
+        ]
+      ]
+    }
+  }
+}
