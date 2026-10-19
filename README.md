@@ -390,14 +390,6 @@ For reliable experimentation:
 
 ---
 
-## ⚠️ Project Status
-
-PredictiveOps is under active development. Its anomaly detection, RUL estimation, feature processing, and monitoring capabilities are separate components that require independent testing before being integrated into a production workflow.
-
-The focus is on building a reproducible, leakage-aware, and observable ML pipeline rather than treating model accuracy as the only measure of success.
-
----
-
 ## 👨‍💻 Author
 
 **Aditya Mitra**
