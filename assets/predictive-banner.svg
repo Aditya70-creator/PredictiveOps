@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 240" width="920" height="240">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1120" />
+      <stop offset="50%" stop-color="#064e3b" />
+      <stop offset="100%" stop-color="#090d16" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="50%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#fbbf24" />
+    </linearGradient>
+    <style>
+      .sensor-wave { animation: waveAnim 3s infinite ease-out; transform-origin: 765px 125px; }
+      .blink-dot { animation: blink 1.6s infinite ease-in-out; }
+      .bar-metric { animation: barAnim 2.8s infinite ease-in-out; }
+      @keyframes waveAnim {
+        0% { r: 12px; opacity: 0.9; }
+        100% { r: 76px; opacity: 0; }
+      }
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.25; }
+      }
+      @keyframes barAnim {
+        0%, 100% { width: 72px; }
+        50% { width: 42px; }
+      }
+    </style>
+  </defs>
+
+  <rect x="2" y="2" width="916" height="236" rx="16" fill="url(#bgGrad)" stroke="#047857" stroke-width="2" />
+  <rect x="10" y="2" width="900" height="4" rx="2" fill="url(#accentGrad)" />
+
+  <line x1="2" y1="60" x2="918" y2="60" stroke="#1e293b" stroke-width="1" stroke-dasharray="6,6" />
+  <line x1="2" y1="120" x2="918" y2="120" stroke="#1e293b" stroke-width="1" stroke-dasharray="6,6" />
+  <line x1="2" y1="180" x2="918" y2="180" stroke="#1e293b" stroke-width="1" stroke-dasharray="6,6" />
+  <line x1="540" y1="6" x2="540" y2="234" stroke="#1e293b" stroke-width="1" stroke-dasharray="6,6" />
+
+  <rect x="42" y="26" width="184" height="26" rx="13" fill="#022c22" stroke="#34d399" stroke-width="1.2" />
+  <circle class="blink-dot" cx="58" cy="39" r="4.5" fill="#34d399" />
+  <text x="72" y="43" fill="#6ee7b7" font-family="Consolas, monospace" font-size="11" font-weight="bold">IoT TELEMETRY MLOps</text>
+
+  <text x="42" y="96" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="40" font-weight="bold">Predictive</text>
+  <text x="235" y="96" fill="#34d399" font-family="Segoe UI, sans-serif" font-size="40" font-weight="bold">Ops</text>
+
+  <text x="42" y="126" fill="#e2e8f0" font-family="Segoe UI, sans-serif" font-size="16" font-weight="bold">Time-Series Anomaly Detection and Predictive Maintenance</text>
+  <text x="42" y="152" fill="#94a3b8" font-family="Segoe UI, sans-serif" font-size="12.5">Rolling Window Features  |  Walk-Forward Validation  |  PyTorch  |  Prometheus</text>
+
+  <g transform="translate(42, 176)" font-family="Consolas, monospace" font-size="11" font-weight="bold">
+    <rect x="0" y="0" width="82" height="26" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="1.2" />
+    <text x="41" y="17" fill="#38bdf8" text-anchor="middle">Python 3.11</text>
+
+    <rect x="90" y="0" width="76" height="26" rx="6" fill="#0f172a" stroke="#34d399" stroke-width="1.2" />
+    <text x="128" y="17" fill="#34d399" text-anchor="middle">PyTorch</text>
+
+    <rect x="174" y="0" width="74" height="26" rx="6" fill="#0f172a" stroke="#fbbf24" stroke-width="1.2" />
+    <text x="211" y="17" fill="#fbbf24" text-anchor="middle">FastAPI</text>
+
+    <rect x="256" y="0" width="102" height="26" rx="6" fill="#0f172a" stroke="#f472b6" stroke-width="1.2" />
+    <text x="307" y="17" fill="#f9a8d4" text-anchor="middle">Prometheus</text>
+
+    <rect x="366" y="0" width="72" height="26" rx="6" fill="#0f172a" stroke="#818cf8" stroke-width="1.2" />
+    <text x="402" y="17" fill="#a5b4fc" text-anchor="middle">Docker</text>
+  </g>
+
+  <g transform="translate(560, 62)">
+    <rect x="0" y="0" width="112" height="118" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.2" />
+    <text x="12" y="22" fill="#94a3b8" font-family="Consolas, monospace" font-size="9.5" font-weight="bold">SENSOR METRICS</text>
+    <rect class="bar-metric" x="12" y="38" width="68" height="10" rx="5" fill="#38bdf8" />
+    <rect class="bar-metric" x="12" y="58" width="52" height="10" rx="5" fill="#34d399" />
+    <rect class="bar-metric" x="12" y="78" width="78" height="10" rx="5" fill="#fbbf24" />
+  </g>
+
+  <circle cx="765" cy="125" r="74" fill="none" stroke="#064e3b" stroke-width="1.5" />
+  <circle cx="765" cy="125" r="50" fill="none" stroke="#065f46" stroke-width="1" stroke-dasharray="4,4" />
+  <circle class="sensor-wave" cx="765" cy="125" r="14" fill="none" stroke="#34d399" stroke-width="2" />
+  <circle cx="765" cy="125" r="11" fill="#0f172a" stroke="#34d399" stroke-width="2.5" />
+  <circle class="blink-dot" cx="765" cy="125" r="4" fill="#38bdf8" />
+</svg>
