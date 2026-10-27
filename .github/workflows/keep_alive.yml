@@ -1,0 +1,31 @@
+name: Keep PredictiveOps App Awake (24x7)
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  ping-predictiveops:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Requests
+        run: pip install requests
+
+      - name: Ping PredictiveOps App
+        run: |
+          python -c "
+          import requests
+          url = 'YOUR_PREDICTIVEOPS_STREAMLIT_URL'
+          try:
+              response = requests.get(url, timeout=30)
+              print(f'Ping successful! Status code: {response.status_code}')
+          except Exception as e:
+              print(f'Ping failed with error: {e}')
+              exit(1)
+          "
