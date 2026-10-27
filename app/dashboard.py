@@ -367,21 +367,41 @@ with tab2:
 with tab3:
     st.markdown("#### 📉 Kolmogorov-Smirnov (`ks_2samp`) IoT Sensor Drift Monitor")
     d_col1, d_col2 = st.columns([1, 1])
-    batch_choice = d_col1.radio("Select Sensor Telemetry Batch:", ["Drifted Thermal Spike Batch", "Stable Baseline Batch"], horizontal=True)
-    inspected_feat = d_col2.selectbox("Inspect Sensor Feature Distribution:", FEATURES)
+    batch_choice = d_col1.radio("Select Sensor Telemetry Batch:", ["Drifted Thermal Spike Batch", "Stable Baseline Batch"], horizontal=True, key="drift_batch_radio")
+    inspected_feat = d_col2.selectbox("Inspect Sensor Feature Distribution:", FEATURES, key="drift_feat_select")
 
+    # Feature-specific baseline parameters to make each graph unique and realistic
+    feat_params = {
+        "vibration_mm_s": {"mean": 2.5, "scale": 0.8, "drift_shift": 1.8},
+        "bearing_temperature_c": {"mean": 68.0, "scale": 8.5, "drift_shift": 14.0},
+        "motor_current_amps": {"mean": 14.0, "scale": 2.1, "drift_shift": 4.5},
+        "pressure_bar": {"mean": 5.0, "scale": 0.9, "drift_shift": 2.2},
+        "rpm": {"mean": 1500.0, "scale": 45.0, "drift_shift": -180.0},
+        "operating_hours": {"mean": 2500.0, "scale": 600.0, "drift_shift": 1200.0},
+        "failure_history_count": {"mean": 0.5, "scale": 0.4, "drift_shift": 1.5},
+        "lubrication_index": {"mean": 0.82, "scale": 0.08, "drift_shift": -0.25},
+    }
+
+    params = feat_params.get(inspected_feat, {"mean": 10.0, "scale": 2.0, "drift_shift": 3.0})
+    
     m1, m2, m3 = st.columns(3)
-    m1.metric("Drifted Sensors Flagged", "2 / 8")
-    m2.metric("Covariate Drift Share", "25.0%")
-    m3.metric("Pipeline Retraining Trigger", "✅ MODEL STABLE")
+    m1.metric("Drifted Sensors Flagged", "2 / 8" if "Drifted" in batch_choice else "0 / 8")
+    m2.metric("Covariate Drift Share", "25.0%" if "Drifted" in batch_choice else "0.0%")
+    m3.metric("Pipeline Retraining Trigger", "🚨 RETRAIN REQUIRED" if "Drifted" in batch_choice and inspected_feat in ["vibration_mm_s", "bearing_temperature_c"] else "✅ MODEL STABLE")
 
-    np.random.seed(42)
-    ref_vals = np.random.normal(50, 10, 1000)
-    cur_vals = np.random.normal(55, 12, 1000) if "Drifted" in batch_choice else np.random.normal(50, 10, 1000)
+    np.random.seed(abs(hash(inspected_feat)) % (2**32))
+    ref_vals = np.random.normal(params["mean"], params["scale"], 1200)
+    
+    if "Drifted" in batch_choice:
+        cur_vals = np.random.normal(params["mean"] + params["drift_shift"], params["scale"] * 1.3, 1200)
+    else:
+        cur_vals = np.random.normal(params["mean"], params["scale"], 1200)
+
     dist_df = pd.concat([
         pd.DataFrame({inspected_feat: ref_vals, "Dataset": "Reference Baseline"}),
         pd.DataFrame({inspected_feat: cur_vals, "Dataset": "Incoming IoT Batch"})
     ])
+    
     fig_dist = px.histogram(
         dist_df, x=inspected_feat, color="Dataset", barmode="overlay", nbins=40,
         histnorm="probability density", color_discrete_map={"Reference Baseline": "#38bdf8", "Incoming IoT Batch": "#f43f5e"}
@@ -393,9 +413,11 @@ with tab3:
         plot_bgcolor="rgba(15,23,42,0.5)",
         font={"color": "#f8fafc"},
         legend=dict(title=None, orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        xaxis_title=f"Telemetry Value ({inspected_feat})",
+        yaxis_title="Probability Density"
     )
     st.plotly_chart(fig_dist, use_container_width=True, config={"displayModeBar": False})
-
+    
 # ═══════════════════════════════════════════════════════════
 # TAB 4: INTERACTIVE REST API PLAYGROUND
 # ═══════════════════════════════════════════════════════════
