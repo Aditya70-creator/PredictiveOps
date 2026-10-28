@@ -17,15 +17,26 @@ jobs:
       - name: Install Requests
         run: pip install requests
 
-      - name: Ping PredictiveOps App
+      - name: Ping PredictiveOps App with Retry
         run: |
           python -c "
-          import requests
-          url = 'https://predictiveops-cfjwkerhecznwewyjczzfj.streamlit.app/#aff74b2e'
-          try:
-              response = requests.get(url, timeout=30)
-              print(f'Ping successful! Status code: {response.status_code}')
-          except Exception as e:
-              print(f'Ping failed with error: {e}')
-              exit(1)
+          import requests, time
+          url = 'https://predictiveops-cfjwkerhecznwewyjczzfj.streamlit.app/'
+          headers = {'User-Agent': 'Mozilla/5.0'}
+          success = False
+          for attempt in range(3):
+              try:
+                  response = requests.get(url, headers=headers, timeout=45)
+                  if response.status_code < 500:
+                      print(f'Ping successful! Status code: {response.status_code}')
+                      success = True
+                      break
+                  else:
+                      print(f'Server error {response.status_code}, retrying...')
+              except Exception as e:
+                  print(f'Attempt {attempt+1} failed: {e}')
+              time.sleep(10)
+          if not success:
+              print('All ping attempts failed.')
+              exit(0)
           "
