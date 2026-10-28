@@ -21,7 +21,7 @@ jobs:
         run: |
           python -c "
           import requests
-          url = 'YOUR_PREDICTIVEOPS_STREAMLIT_URL'
+          url = 'https://predictiveops-cfjwkerhecznwewyjczzfj.streamlit.app/#aff74b2e'
           try:
               response = requests.get(url, timeout=30)
               print(f'Ping successful! Status code: {response.status_code}')
